@@ -204,6 +204,9 @@ vim.keymap.set('x', '<leader>p', [["_dP]], { desc = 'Paste without loosing the c
 vim.keymap.set({ 'n', 'v' }, '<leader>y', [["+y]], { desc = "Share clipboard with system's one" })
 vim.keymap.set('n', '<leader>Y', [["+Y]])
 vim.keymap.set({ 'n', 'v' }, '<leader>d', '"_d', { desc = 'Delete without replacing current clipboard' })
+vim.keymap.set({ 'n', 'v' }, '<leader>bp', ':bp<CR>', { desc = '[B]uffer [P]revious' })
+vim.keymap.set({ 'n', 'v' }, '<leader>bn', ':bn<CR>', { desc = '[B]uffer [N]ext' })
+vim.keymap.set({ 'n', 'v' }, '<leader>bd', ':bd<CR>', { desc = '[B]uffer [D]elete' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -513,6 +516,85 @@ require('lazy').setup({
       { '<c-\\>', '<cmd><C-U>TmuxNavigatePrevious<cr>' },
     },
   },
+  -- Markdown renderer
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
+  },
+  -- nvim-dap: Debug Adapter Protocol
+  {
+    'mfussenegger/nvim-dap',
+    dependencies = { 'rcarriga/nvim-dap-ui', 'nvim-neotest/nvim-nio' },
+    config = function()
+      local dap = require 'dap'
+      local ui = require 'dapui'
+
+      ui.setup()
+
+      -- BREAKPOINTS
+      -- Debug toggle breakpoint
+      vim.keymap.set('n', '<leader>bb', dap.toggle_breakpoint, { desc = '[B]reakpoint toggle' })
+
+      -- Clear all Debug breakpoints
+      vim.keymap.set('n', '<leader>br', dap.clear_breakpoints, { desc = '[B]reakpoint [R]emove (all)' })
+
+      -- DEBUG actions
+      -- Debug show hover information
+      vim.keymap.set('n', '<leader>?', function()
+        ui.eval(nil, { enter = true })
+      end, { desc = '[D]ebug [I]nformation' })
+
+      -- Debug start / continue
+      vim.keymap.set('n', '<leader>dc', dap.continue, { desc = '[D]ebug [C]continue / Start' })
+
+      -- Debug step into
+      vim.keymap.set('n', '<leader>di', dap.step_into, { desc = '[D]ebug [I]nto' })
+
+      -- Debug step over
+      vim.keymap.set('n', '<leader>dv', dap.step_over, { desc = '[D]ebug o[V]er' })
+
+      -- Debug step out
+      vim.keymap.set('n', '<leader>do', dap.step_out, { desc = '[D]ebug [O]ut' })
+
+      -- Debug step back
+      vim.keymap.set('n', '<leader>db', dap.step_back, { desc = '[D]ebug [B]ack' })
+
+      -- Debug terminate
+      vim.keymap.set('n', '<leader>dt', dap.terminate, { desc = '[D]ebug [T]erminate' })
+
+      -- Debug restart
+      vim.keymap.set('n', '<leader>dr', dap.restart, { desc = '[D]ebug [R]estart' })
+
+      -- Setup UI during Debug
+      dap.listeners.before.attach.dapui_config = function()
+        ui.open()
+      end
+      dap.listeners.before.launch.dapui_config = function()
+        ui.open()
+      end
+      dap.listeners.before.event_terminated.dapui_config = function()
+        ui.close()
+      end
+      dap.listeners.before.event_exited.dapui_config = function()
+        ui.close()
+      end
+    end,
+  },
+  -- nvim-dap-python: Python debugger
+  {
+    'mfussenegger/nvim-dap-python',
+    dependencies = { 'mfussenegger/nvim-dap' },
+    ft = 'python',
+    config = function()
+      -- Update the path passed to setup to point to your system or virtual environment Python binary
+      require('dap-python').setup 'python'
+    end,
+  },
   -- NOTE: END custom plugins
 
   -- LSP Plugins
@@ -624,6 +706,12 @@ require('lazy').setup({
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+
+          -- NOTE: Start custom mappings
+          --  Display symbol hover information
+          map('<leader>gg', vim.lsp.buf.hover, 'Display symbol hover information')
+
+          -- NOTE: End custom mappings
 
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
