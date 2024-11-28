@@ -537,6 +537,7 @@ require('lazy').setup({
       ui.setup()
 
       -- BREAKPOINTS
+      vim.fn.sign_define('DapBreakpoint', { text = '🛑', texthl = '', linehl = '', numhl = '' })
       -- Debug toggle breakpoint
       vim.keymap.set('n', '<leader>bb', dap.toggle_breakpoint, { desc = '[B]reakpoint toggle' })
 
@@ -593,6 +594,94 @@ require('lazy').setup({
     config = function()
       -- Update the path passed to setup to point to your system or virtual environment Python binary
       require('dap-python').setup 'python'
+    end,
+  },
+  -- zen-mode: Zoom on buffer for free distraction editing
+  {
+    'folke/zen-mode.nvim',
+    config = function()
+      require('zen-mode').setup {
+        window = {
+          backdrop = 0.8,
+          width = 0.95,
+          height = 0.95,
+        },
+      }
+
+      vim.keymap.set({ 'n', 'v' }, '<leader>z', require('zen-mode').toggle, { desc = '[Z]en mode toggle' })
+    end,
+  },
+  -- neotest: Plugin for launching tests
+  {
+    'nvim-neotest/neotest',
+    dependencies = {
+      'nvim-neotest/nvim-nio',
+      'nvim-lua/plenary.nvim',
+      'antoinemadec/FixCursorHold.nvim',
+      'nvim-treesitter/nvim-treesitter',
+      -- Langague specific
+      'nvim-neotest/neotest-python',
+    },
+    config = function()
+      require('neotest').setup {
+        adapters = {
+          require 'neotest-python' {
+            dap = { justMyCode = true },
+            args = { '-vv' },
+          },
+        },
+        output = { open_on_run = true, enabled = true },
+        output_panel = {
+          enabled = false,
+        },
+        discovery = {
+          enabled = false,
+          concurrent = 1,
+        },
+      }
+
+      -- Run
+      -- Run nearest test
+      vim.keymap.set('n', '<leader>tr', require('neotest').run.run, { desc = '[T]est [R]un nearest' })
+      -- Run last test
+      vim.keymap.set('n', '<leader>tl', require('neotest').run.run_last, { desc = '[T]est run [L]ast' })
+      -- Run tests in file
+      vim.keymap.set('n', '<leader>tf', function()
+        require('neotest').run.run(vim.fn.expand '%')
+      end, { desc = '[T]est [F]ile' })
+      -- Run all tests
+      vim.keymap.set('n', '<leader>ta', function()
+        require('neotest').run.run(vim.loop.cwd())
+      end, { desc = '[T]est [A]ll' })
+
+      -- Debug
+      -- Debug nearest test
+      vim.keymap.set('n', '<leader>tR', function()
+        require('neotest').run.run { strategy = 'dap' }
+      end, { desc = '[T]est debug [R]un nearest' })
+      -- Debug last test
+      vim.keymap.set('n', '<leader>tL', function()
+        require('neotest').run.run_last { strategy = 'dap' }
+      end, { desc = '[T]est debug run [L]ast' })
+      -- Debug tests in file
+      vim.keymap.set('n', '<leader>tF', function()
+        require('neotest').run.run { vim.fn.expand '%', strategy = 'dap' }
+      end, { desc = '[T]est debug [F]ile' })
+      -- Debug all tests
+      vim.keymap.set('n', '<leader>tA', function()
+        require('neotest').run.run { vim.loop.cwd(), strategy = 'dap' }
+      end, { desc = '[T]est debug [A]ll' })
+
+      -- Outputs and summaries
+      vim.keymap.set('n', '<leader>ts', require('neotest').summary.toggle, { desc = '[T]est toggle [S]ummary' })
+      --vim.keymap.set('n', '<leader>to', require('neotest').output_panel.toggle, { desc = '[T]est toggle [O]utput' })
+      vim.keymap.set('n', '<leader>to', function()
+        require('neotest').output.open { enter = true, auto_close = true }
+      end, { desc = '[T]est [O]utput window' })
+
+      -- During test
+      vim.keymap.set('n', '<leader>tS', require('neotest').run.stop, { desc = '[T]est [S]top' })
+      vim.keymap.set('n', '<leader>tA', require('neotest').run.attach, { desc = '[T]est [A]ttach' })
     end,
   },
   -- NOTE: END custom plugins
@@ -708,9 +797,9 @@ require('lazy').setup({
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
           -- NOTE: Start custom mappings
-          --  Display symbol hover information
-          map('<leader>gg', vim.lsp.buf.hover, 'Display symbol hover information')
 
+          -- Display symbol hover information
+          map('<leader>gg', vim.lsp.buf.hover, 'Display symbol hover information')
           -- NOTE: End custom mappings
 
           -- The following two autocommands are used to highlight references of the
