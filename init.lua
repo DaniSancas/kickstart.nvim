@@ -536,6 +536,12 @@ require('lazy').setup({
 
       ui.setup()
 
+      -- WARN: Ensure `debugpy` is installed and reacheable
+      dap.adapters.python = {
+        type = 'executable',
+        command = 'python',
+        args = { '-m', 'debugpy.adapter' },
+      }
       -- BREAKPOINTS
       vim.fn.sign_define('DapBreakpoint', { text = '🛑', texthl = '', linehl = '', numhl = '' })
       -- Debug toggle breakpoint
@@ -615,28 +621,15 @@ require('lazy').setup({
   {
     'nvim-neotest/neotest',
     dependencies = {
-      'nvim-neotest/nvim-nio',
-      'nvim-lua/plenary.nvim',
-      'antoinemadec/FixCursorHold.nvim',
-      'nvim-treesitter/nvim-treesitter',
-      -- Langague specific
       'nvim-neotest/neotest-python',
     },
     config = function()
       require('neotest').setup {
         adapters = {
           require 'neotest-python' {
-            dap = { justMyCode = true },
+            dap = { justMyCode = false },
             args = { '-vv' },
           },
-        },
-        output = { open_on_run = true, enabled = true },
-        output_panel = {
-          enabled = false,
-        },
-        discovery = {
-          enabled = false,
-          concurrent = 1,
         },
       }
 
@@ -912,6 +905,11 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
         'debugpy', -- Python debugger
+        'black', -- Python formatter
+        'flake8', -- Python formatter
+        'isort', -- Python import sorter
+        'mypy', -- Python optional static typing
+        'pylint', -- Python static code analysis tool
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -962,14 +960,19 @@ require('lazy').setup({
           lsp_format_opt = 'fallback'
         end
         return {
-          timeout_ms = 500,
+          timeout_ms = 5000,
           lsp_format = lsp_format_opt,
         }
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        python = { 'ruff' },
+        python = {
+          'flake8',
+          'mypy',
+          'black',
+          'isort',
+        },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
