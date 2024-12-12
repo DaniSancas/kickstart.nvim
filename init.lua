@@ -836,6 +836,14 @@ require('lazy').setup({
         end,
       })
 
+      -- NOTE: Custom autoformat for supported file types
+      vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
+        pattern = { '*.tf', '*.tfvars' },
+        callback = function()
+          vim.lsp.buf.format()
+        end,
+      })
+
       -- Change diagnostic symbols in the sign column (gutter)
       -- if vim.g.have_nerd_font then
       --   local signs = { Error = '', Warn = '', Hint = '', Info = '' }
@@ -865,6 +873,7 @@ require('lazy').setup({
         -- clangd = {},
         gopls = {},
         pyright = {},
+        terraformls = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -910,6 +919,7 @@ require('lazy').setup({
         'isort', -- Python import sorter
         'mypy', -- Python optional static typing
         'pylint', -- Python static code analysis tool
+        'tflint', -- Terraform linter
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -917,6 +927,7 @@ require('lazy').setup({
         ensure_installed = {
           'gopls',
           'pyright',
+          'terraformls',
         },
         handlers = {
           function(server_name)
@@ -1194,7 +1205,7 @@ require('lazy').setup({
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
