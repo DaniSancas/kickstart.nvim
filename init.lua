@@ -218,6 +218,19 @@ vim.keymap.set('n', '<leader>p', function()
   vim.api.nvim_win_set_cursor(0, { row, col + #text })
 end, { desc = 'Insert link from clipboard', noremap = true, silent = true })
 
+-- NOTE: This is specific for `knowledge-base` project
+-- Function to open a page with today's date in the journal folder
+function OpenJournalPage()
+  -- Get the current date in YYYY-MM-DD format
+  local date = os.date '%Y-%m-%d'
+  -- Construct the file path
+  local filepath = './journal/' .. date .. '.md'
+  -- Open the file in a left above vertical split
+  vim.cmd('leftabove vsplit ' .. filepath)
+end
+-- Map the function to a key, e.g., <Leader>j
+vim.api.nvim_set_keymap('n', '<Leader>j', ':lua OpenJournalPage()<CR>', { noremap = true, silent = true })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
