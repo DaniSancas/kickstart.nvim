@@ -208,6 +208,19 @@ vim.keymap.set({ 'n', 'v' }, '<leader>bp', ':bp<CR>', { desc = '[B]uffer [P]revi
 vim.keymap.set({ 'n', 'v' }, '<leader>bn', ':bn<CR>', { desc = '[B]uffer [N]ext' })
 vim.keymap.set({ 'n', 'v' }, '<leader>bd', ':bd<CR>', { desc = '[B]uffer [D]elete' })
 
+-- NOTE: This is specific for `knowledge-base` project
+-- Function to open a page with today's date in the journal folder
+function OpenJournalPage()
+  -- Get the current date in YYYY-MM-DD format
+  local date = os.date '%Y-%m-%d'
+  -- Construct the file path
+  local filepath = './journal/' .. date .. '.md'
+  -- Open the file in a left above vertical split
+  vim.cmd('leftabove vsplit ' .. filepath)
+end
+-- Map the function to a key, e.g., <Leader>j
+vim.api.nvim_set_keymap('n', '<Leader>j', ':lua OpenJournalPage()<CR>', { noremap = true, silent = true })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
