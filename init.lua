@@ -190,6 +190,15 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- NOTE: Custom mappings
+vim.keymap.set('x', '<leader>p', [["_dP]], { desc = 'Paste without loosing the current clipboard' })
+vim.keymap.set({ 'n', 'v' }, '<leader>y', [["+y]], { desc = "Share clipboard with system's one" })
+vim.keymap.set('n', '<leader>Y', [["+Y]])
+vim.keymap.set({ 'n', 'v' }, '<leader>d', '"_d', { desc = 'Delete without replacing current clipboard' })
+vim.keymap.set({ 'n', 'v' }, '<leader>bp', ':bp<CR>', { desc = '[B]uffer [P]revious' })
+vim.keymap.set({ 'n', 'v' }, '<leader>bn', ':bn<CR>', { desc = '[B]uffer [N]ext' })
+vim.keymap.set({ 'n', 'v' }, '<leader>bd', ':bd<CR>', { desc = '[B]uffer [D]elete' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
