@@ -198,6 +198,16 @@ vim.keymap.set({ 'n', 'v' }, '<leader>d', '"_d', { desc = 'Delete without replac
 vim.keymap.set({ 'n', 'v' }, '<leader>bp', ':bp<CR>', { desc = '[B]uffer [P]revious' })
 vim.keymap.set({ 'n', 'v' }, '<leader>bn', ':bn<CR>', { desc = '[B]uffer [N]ext' })
 vim.keymap.set({ 'n', 'v' }, '<leader>bd', ':bd<CR>', { desc = '[B]uffer [D]elete' })
+-- Insert a link previously copied to clipboard
+vim.keymap.set('n', '<leader>p', function()
+  local url = vim.fn.getreg '+'
+  local text = ' [Link](' .. url .. ')'
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local line = vim.api.nvim_get_current_line()
+  local new_line = line:sub(1, col) .. text .. line:sub(col + 1)
+  vim.api.nvim_set_current_line(new_line)
+  vim.api.nvim_win_set_cursor(0, { row, col + #text })
+end, { desc = 'Insert link from clipboard', noremap = true, silent = true })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
